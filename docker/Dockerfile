@@ -19,6 +19,8 @@ RUN apt-get update &&  \
     apt-get install -y \
     software-properties-common \
     git \
+    curl \
+    unzip \
     trash-cli && \
     mkdir -p \
     /app \
@@ -30,7 +32,7 @@ RUN apt-get update &&  \
     # MKVToolNix
     wget -O /usr/share/keyrings/gpg-pub-moritzbunkus.gpg https://mkvtoolnix.download/gpg-pub-moritzbunkus.gpg && \
     echo '[signed-by=/usr/share/keyrings/gpg-pub-moritzbunkus.gpg] https://mkvtoolnix.download/ubuntu/ jammy main' > /etc/apt/sources.list.d/mkvtoolnix.list && \
-    apt-get update && apt-get install -y curl unzip mkvtoolnix libtesseract-dev && \
+    apt-get update && apt-get install -y mkvtoolnix libtesseract-dev && \
     if uname -m | grep -q x86; then \    
     # FFmpeg
     apt install -y wget && \
