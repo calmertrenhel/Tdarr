@@ -19,8 +19,8 @@ RUN apt-get update &&  \
     apt-get install -y \
     software-properties-common \
     git \
+    wget \
     curl \
-    unzip \
     trash-cli && \
     mkdir -p \
     /app \
@@ -31,19 +31,20 @@ RUN apt-get update &&  \
     usermod -G users Tdarr && \
     # MKVToolNix
     wget -O /usr/share/keyrings/gpg-pub-moritzbunkus.gpg https://mkvtoolnix.download/gpg-pub-moritzbunkus.gpg && \
-    echo '[signed-by=/usr/share/keyrings/gpg-pub-moritzbunkus.gpg] https://mkvtoolnix.download/ubuntu/ jammy main' > /etc/apt/sources.list.d/mkvtoolnix.list && \
+    echo 'deb [signed-by=/usr/share/keyrings/gpg-pub-moritzbunkus.gpg] https://mkvtoolnix.download/ubuntu/ jammy main' > /etc/apt/sources.list.d/mkvtoolnix.list && \
     apt-get update && apt-get install -y mkvtoolnix libtesseract-dev && \
     if uname -m | grep -q x86; then \    
     # FFmpeg
-    apt install -y wget && \
     wget https://repo.jellyfin.org/releases/server/ubuntu/versions/jellyfin-ffmpeg/5.1.2-7/jellyfin-ffmpeg5_5.1.2-7-jammy_amd64.deb && \
     apt install -y \
     ./jellyfin-ffmpeg5_5.1.2-7-jammy_amd64.deb && \
     ln -s /usr/lib/jellyfin-ffmpeg/ffmpeg /usr/local/bin/ffmpeg && \
     ln -s /usr/lib/jellyfin-ffmpeg/ffmpeg /usr/local/bin/tdarr-ffmpeg && \
     # Intel deps
-    curl -s https://repositories.intel.com/graphics/intel-graphics.key | apt-key add - && \
-    echo 'deb [arch=amd64] https://repositories.intel.com/graphics/ubuntu jammy main' > /etc/apt/sources.list.d/intel-graphics.list && \
+    apt-get install -y gpg-agent && \
+    wget -qO - https://repositories.intel.com/graphics/intel-graphics.key | gpg --dearmor --output /usr/share/keyrings/intel-graphics.gpg && \
+    echo 'deb [arch=amd64,i386 signed-by=/usr/share/keyrings/intel-graphics.gpg] https://repositories.intel.com/graphics/ubuntu jammy arc' | \
+    tee  /etc/apt/sources.list.d/intel.gpu.jammy.list && \
     apt-get update && \
     apt-get install -y --no-install-recommends \
     intel-media-va-driver-non-free \
