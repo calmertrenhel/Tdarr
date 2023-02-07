@@ -21,6 +21,7 @@ RUN apt-get update &&  \
     git \
     wget \
     curl \
+    unzip \
     trash-cli && \
     mkdir -p \
     /app \
