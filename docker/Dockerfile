@@ -1,4 +1,4 @@
-FROM lsiobase/ubuntu:focal
+FROM lsiobase/ubuntu:jammy
 
 ARG VERSION
 ARG MODULE
@@ -8,7 +8,7 @@ ENV \
  LD_LIBRARY_PATH="/usr/lib/x86_64-linux-gnu" \
  NVIDIA_DRIVER_CAPABILITIES="compute,video,utility" \
  NVIDIA_VISIBLE_DEVICES="all" \
- HANDBRAKE=1.5.1
+ HANDBRAKE=1.6.1
 
 ENV WEB_UI_PORT="8265" SERVER_PORT="8266" NODE_PORT="8267" PUID="1000" PGID="1000" UMASK="002" TZ="Etc/UTC" HOME="/home/Tdarr"
 
@@ -28,20 +28,24 @@ RUN apt-get update &&  \
     useradd -u ${PUID} -U -d ${HOME} -s /bin/false Tdarr && \
     usermod -G users Tdarr && \
     
+    # MKVToolNix
+    wget -O /usr/share/keyrings/gpg-pub-moritzbunkus.gpg https://mkvtoolnix.download/gpg-pub-moritzbunkus.gpg && \
+    echo '[signed-by=/usr/share/keyrings/gpg-pub-moritzbunkus.gpg] https://mkvtoolnix.download/ubuntu/ jammy main' > /etc/apt/sources.list.d/mkvtoolnix.list && \
+    
     apt-get update && apt-get install -y curl unzip mkvtoolnix libtesseract-dev && \
     if uname -m | grep -q x86; then \    
         # FFmpeg
         apt install -y wget && \
-        wget https://repo.jellyfin.org/releases/server/ubuntu/versions/jellyfin-ffmpeg/4.3.2-1/jellyfin-ffmpeg_4.3.2-1-focal_amd64.deb && \
+        wget https://repo.jellyfin.org/releases/server/ubuntu/versions/jellyfin-ffmpeg/5.1.2-7/jellyfin-ffmpeg5_5.1.2-7-jammy_amd64.deb && \
         apt install -y \
-        ./jellyfin-ffmpeg_4.3.2-1-focal_amd64.deb && \
+        ./jellyfin-ffmpeg5_5.1.2-7-jammy_amd64.deb && \
         ln -s /usr/lib/jellyfin-ffmpeg/ffmpeg /usr/local/bin/ffmpeg && \
         ln -s /usr/lib/jellyfin-ffmpeg/ffmpeg /usr/local/bin/tdarr-ffmpeg && \
         # apt-get install -y ffmpeg && \
      
         # Intel deps
         curl -s https://repositories.intel.com/graphics/intel-graphics.key | apt-key add - && \
-        echo 'deb [arch=amd64] https://repositories.intel.com/graphics/ubuntu focal main' > /etc/apt/sources.list.d/intel-graphics.list && \
+        echo 'deb [arch=amd64] https://repositories.intel.com/graphics/ubuntu jammy main' > /etc/apt/sources.list.d/intel-graphics.list && \
         apt-get update && \
         apt-get install -y --no-install-recommends \
             intel-media-va-driver-non-free \
